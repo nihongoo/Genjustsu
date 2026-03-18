@@ -3,9 +3,34 @@
 import React, { useState, useEffect } from 'react';
 import { useOS } from './os-context';
 import { Wifi, Volume2, Grid2x2 } from 'lucide-react';
+import { FluidFire } from '../ui/fluid-fire'
 export function Taskbar() {
   const { state, dispatch } = useOS();
   const [time, setTime] = useState('');
+  const config = {
+    config: {
+      width: 80,
+      height: 40,
+      fps: 30,
+      gridResolution: 10000,
+      gravity: 0.0,
+      burningFloor: true,
+      burningObstacle: false,
+      floorShape: 'bottom',
+      floorThickness: 1,
+      floorCurve: 0,
+      colorScheme: 'blue',
+      showSwirls: false,
+      swirlProbability: 50,
+    },
+    style: {
+      canvas: {
+        border: 'none',
+        borderRadius: '12px',
+        overflow: 'hidden',
+      },
+    }
+  };
 
   useEffect(() => {
     const updateTime = () => {
@@ -29,85 +54,23 @@ export function Taskbar() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 h-12 bg-[#2b2b2b] flex items-center justify-between px-2 z-[9999] overflow-visible">
-      
-      {/* SVG Filter Definition */}
-      <svg width="0" height="0" style={{ position: 'absolute' }}>
-        <defs>
-          <filter id="taskbar-fire-filter" x="-50%" y="-50%" width="200%" height="200%">
-            <feTurbulence 
-              type="fractalNoise" 
-              baseFrequency="0.015 0.08" 
-              numOctaves={6}
-              result="turbulence" 
-              seed={1}
-            >
-              <animate 
-                attributeName="seed" 
-                from="1" 
-                to="100" 
-                dur="3s" 
-                repeatCount="indefinite"
-              />
-            </feTurbulence>
-            
-            <feDisplacementMap 
-              in2="turbulence" 
-              in="SourceGraphic" 
-              scale={15}
-              xChannelSelector="R" 
-              yChannelSelector="G"
-            />
-            
-            <feColorMatrix 
-              type="matrix" 
-              values="1.5 0 0 0 0  0.8 0.5 0 0 0  0 0 0.2 0 0  0 0 0 1 0"
-            />
-          </filter>
-          
-          <linearGradient id="taskbar-fire-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style={{ stopColor: '#ffff00', stopOpacity: 0.9 }}>
-              <animate 
-                attributeName="stop-color" 
-                values="#ffff00;#ffaa00;#ffff00" 
-                dur="1.5s" 
-                repeatCount="indefinite"
-              />
-            </stop>
-            <stop offset="50%" style={{ stopColor: '#ff6b00', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#ff0000', stopOpacity: 0.9 }}>
-              <animate 
-                attributeName="stop-color" 
-                values="#ff0000;#ff3300;#ff0000" 
-                dur="1.5s" 
-                repeatCount="indefinite"
-              />
-            </stop>
-          </linearGradient>
-        </defs>
-      </svg>
 
-      {/* Fire Border Overlay */}
-      <svg 
-        className="absolute left-0 right-0 pointer-events-none" 
-        style={{ 
-          top: '-3px',
-          height: '8px',
+      <div
+        className="absolute left-0 right-0 pointer-events-none"
+        style={{
+          top: '-100px',  // Lửa nhô lên trên
+          height: '100px',  // Chỉ show phần lửa
+          overflow: 'hidden',
           width: '100%',
-          overflow: 'visible'
         }}
-        preserveAspectRatio="none"
-        viewBox="0 0 1000 10"
       >
-        <line 
-          x1="0" 
-          y1="5" 
-          x2="1000" 
-          y2="5" 
-          stroke="url(#taskbar-fire-gradient)" 
-          strokeWidth="5" 
-          filter="url(#taskbar-fire-filter)"
+        <FluidFire
+          {...config.config}
+          interactive={false}
+          backgroundColor='transparent'
+          style={config.style.canvas}
         />
-      </svg>
+      </div>
 
       {/* LEFT AREA */}
       <div className="flex items-center gap-1">
@@ -115,9 +78,8 @@ export function Taskbar() {
         {/* START BUTTON */}
         <button
           onClick={() => dispatch({ type: 'TOGGLE_START_MENU' })}
-          className={`h-10 w-12 flex items-center justify-center hover:bg-white/10 transition ${
-            state.startMenuOpen ? 'bg-white/10' : ''
-          }`}
+          className={`h-10 w-12 flex items-center justify-center hover:bg-white/10 transition ${state.startMenuOpen ? 'bg-white/10' : ''
+            }`}
         >
           <Grid2x2 size={20} className="text-white" />
         </button>
