@@ -13,36 +13,36 @@ export const FluidFire = ({
     height = 60,
     fps = 30,
     gridResolution = 10000,
-    
+
     // Physics
     gravity = 0.0,
     numIters = 10,
-    
+
     // Fire sources
     burningFloor = true,
     burningObstacle = false,
-    
+
     // Floor shape
     floorShape = 'bottom',
     floorThickness = 4,
     floorCurve = 0,
-    
+
     // Swirls
     showSwirls = false,
     swirlProbability = 50.0,
     swirlMaxRadius = 0.05,
-    
+
     // Colors
     colorScheme = 'fire',
-    
+
     // Styling
     className = '',
     style = {},
     backgroundColor = '#transparent',
-    
+
     // Interaction
     interactive = true,
-    
+
     // Callbacks
     onSimulationReady = null,
     onMouseMove = null,
@@ -95,7 +95,7 @@ export const FluidFire = ({
         const y = (height - my) / cScale;
 
         setObstacle(x, y, false);
-        
+
         if (onMouseMove) {
             onMouseMove({ x, y, screenX: mx, screenY: my });
         }
@@ -141,8 +141,10 @@ export const FluidFire = ({
             className={className}
             style={{
                 width: '100%',
-                height: 'auto',
+                height: '100%',
                 display: 'block',
+                objectFit: 'fill', // ← Thêm
+                verticalAlign: 'bottom',
                 cursor: interactive ? 'crosshair' : 'default',
                 ...style,
             }}

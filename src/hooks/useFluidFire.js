@@ -13,28 +13,28 @@ export const useFluidFire = ({
     height = 600,
     fps = 30,
     gridResolution = 10000,
-    
+
     // Physics
     gravity = 0.0,
     numIters = 10,
-    
+
     // Fire sources
     burningFloor = true,
     burningObstacle = false,
-    
+
     // Floor shape
     floorShape = 'bottom',
     floorThickness = 4,
     floorCurve = 0,
-    
+
     // Swirls
     showSwirls = false,
     swirlProbability = 50.0,
     swirlMaxRadius = 0.05,
-    
+
     // Colors
     colorScheme = 'fire',
-    
+
     // Callbacks
     onSimulationReady = null,
 } = {}) => {
@@ -44,7 +44,7 @@ export const useFluidFire = ({
     const obstacleGroupRef = useRef(null);
     const animationFrameRef = useRef(null);
     const lastFrameTimeRef = useRef(0);
-    
+
     const [isReady, setIsReady] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [stats, setStats] = useState({
@@ -95,7 +95,7 @@ export const useFluidFire = ({
 
         // Create fluid simulator
         fluidRef.current = new Fluid(numX, numY, h);
-        
+
         // Bind floor shape checker
         fluidRef.current.isInFloorShape = (i, j) => isInFloorShape(i, j, sceneRef.current);
 
@@ -140,6 +140,7 @@ export const useFluidFire = ({
                 rect.setAttribute('width', cellWidth);
                 rect.setAttribute('height', cellHeight);
                 rect.setAttribute('fill', 'transparent');
+                rect.setAttribute('shape-rendering', 'crispEdges');
 
                 gridGroup.appendChild(rect);
                 gridCellsRef.current.push(rect);
@@ -190,7 +191,7 @@ export const useFluidFire = ({
 
             case 'box':
                 return j < thickness || j >= scene.numY - thickness ||
-                       i < thickness || i >= scene.numX - thickness;
+                    i < thickness || i >= scene.numX - thickness;
 
             case 'diagonal':
                 const diagThick = thickness * scene.h;
@@ -312,7 +313,7 @@ export const useFluidFire = ({
     // Update scene config when props change
     useEffect(() => {
         if (!sceneRef.current) return;
-        
+
         sceneRef.current.burningFloor = burningFloor;
         sceneRef.current.burningObstacle = burningObstacle;
         sceneRef.current.showSwirls = showSwirls;
@@ -322,7 +323,7 @@ export const useFluidFire = ({
         sceneRef.current.floorShape = floorShape;
         sceneRef.current.floorThickness = floorThickness;
         sceneRef.current.floorCurve = floorCurve;
-    }, [burningFloor, burningObstacle, showSwirls, swirlProbability, 
+    }, [burningFloor, burningObstacle, showSwirls, swirlProbability,
         swirlMaxRadius, gravity, floorShape, floorThickness, floorCurve]);
 
     // Store obstacle group ref
