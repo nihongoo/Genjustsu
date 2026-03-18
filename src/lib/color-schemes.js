@@ -171,6 +171,35 @@ export const COLOR_SCHEMES = {
             return [Math.floor(255 * r), Math.floor(255 * g), Math.floor(255 * b)];
         }
     },
+    black: {
+        name: 'Amaterasu',
+        getColor: (temp) => {
+            temp = Math.min(Math.max(temp, 0.0), 1.0);
+            let r, g, b;
+ 
+            if (temp < 0.3) {
+                // Vùng tối: Đen gần như hoàn toàn với chút đỏ
+                const s = temp / 0.3;
+                r = 0.15 * s;
+                g = 0.0;
+                b = 0.05 * s;
+            } else if (temp < 0.6) {
+                // Vùng giữa: Đỏ đen huyền bí
+                const s = (temp - 0.3) / 0.3;
+                r = 0.15 + 0.35 * s;
+                g = 0.0;
+                b = 0.05 + 0.15 * s;
+            } else {
+                // Vùng nóng nhất: Đỏ cam tối với chút tím
+                const s = (temp - 0.6) / 0.4;
+                r = 0.5 + 0.3 * s;
+                g = 0.1 * s;
+                b = 0.2 + 0.2 * s;
+            }
+ 
+            return [Math.floor(255 * r), Math.floor(255 * g), Math.floor(255 * b)];
+        }
+    },
 
     // Rainbow/spectrum
     rainbow: {

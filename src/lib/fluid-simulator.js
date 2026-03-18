@@ -1,6 +1,7 @@
 /**
  * Fluid Dynamics Simulator
  * Based on Navier-Stokes equations with Semi-Lagrangian method
+ * OPTIMIZED: Tăng số lượng cell và giảm độ cao ngọn lửa
  */
 
 export const FIELD_TYPES = {
@@ -240,9 +241,12 @@ export class Fluid {
         const swirlDamping = 10.0 * dt;
         const swirlProbability = sceneConfig.swirlProbability * h * h;
 
-        const fireCooling = 1.2 * dt;
+        // TỐI ƯU: Tăng cooling để lửa nguội nhanh hơn và không bay cao
+        const fireCooling = 1.8 * dt; // Tăng từ 1.2 lên 1.8
         const smokeCooling = 0.3 * dt;
-        const lift = 3.0;
+        const lift = 2.0; // Giảm từ 3.0 xuống 1.8
+        
+        // TỐI ƯU: Giảm acceleration để lửa chậm hơn
         const acceleration = 6.0 * dt;
         const kernelRadius = sceneConfig.swirlMaxRadius;
 
