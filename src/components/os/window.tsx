@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, ReactNode } from 'react';
+import React, { useState, ReactNode, useEffect } from 'react';
 import { X, Minus, Square } from 'lucide-react';
 import { useOS } from './os-context';
+import FluidFire from '../ui/fluid-fire';
 
 interface WindowProps {
   id: string;
@@ -30,6 +31,23 @@ export function Window({
   const { dispatch } = useOS();
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [fireWidth, setFireWidth] = useState(800);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    const updateFireWidth = () => {
+      const width = window.innerWidth >= 768
+        ? 800
+        : window.innerWidth / 1.88;
+      setFireWidth(width);
+    };
+
+    updateFireWidth();
+    setIsMounted(true);
+
+    window.addEventListener('resize', updateFireWidth);
+    return () => window.removeEventListener('resize', updateFireWidth);
+  }, []);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
@@ -66,18 +84,67 @@ export function Window({
     zIndex: zIndex,
   };
 
+  const config = {
+    config: {
+      width: fireWidth,
+      height: 35,
+      fps: 30,
+      gridResolution: fireWidth < 400 ? 8000 : 18000,
+      gravity: 0.0,
+      burningFloor: true,
+      burningObstacle: false,
+      floorShape: 'bottom',
+      floorThickness: 1,
+      floorCurve: 0,
+      colorScheme: 'black',
+      showSwirls: false,
+      swirlProbability: 25,
+    },
+    style: {
+      canvas: {
+        border: 'none',
+        borderRadius: '0px',
+        overflow: 'hidden',
+      },
+    }
+  };
+
   return (
     <div
       style={windowStyle}
-      className="flex flex-col bg-white dark:bg-[#2a2a2a] border border-[#d0d0d0] dark:border-[#404040] shadow-lg"
+      className="flex flex-col dark:bg-[#2a2a2a] dark:border-[#404040] shadow-lg"
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
+      {isMounted && (
+        <div
+          className="left-0 right-0 pointer-events-none !z-[1]"
+          style={{
+            height: '32px',
+            overflow: 'hidden',
+            width: '100%',
+          }}
+        >
+          <div style={{
+            width: '100%',
+            height: '100%',
+            position: 'relative',
+            bottom: 0,
+          }}>
+            <FluidFire
+              {...config.config}
+              interactive={false}
+              backgroundColor='transparent'
+              style={config.style.canvas}
+            />
+          </div>
+        </div>
+      )}
       {/* Title Bar */}
       <div
         onMouseDown={handleMouseDown}
-        className="flex items-center justify-between h-8 bg-[#0078d4] text-white px-2 cursor-move select-none flex-shrink-0"
+        className="flex bg-blue items-center justify-between h-8 bg-[#0078d4] text-white px-2 cursor-move select-none flex-shrink-0"
       >
         <div className="flex items-center gap-2 flex-1">
           <span className="text-sm">{icon}</span>
