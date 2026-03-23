@@ -9,16 +9,8 @@ import { SkillsWindow } from '../windows/skills-window';
 import { ProjectsWindow } from '../windows/projects-window';
 import { ContactWindow } from '../windows/contact-window';
 import { ResumeWindow } from '../windows/resume-window';
-import ThisPC from '../../assets/this-pc.png';
 import { VideoWallpaper } from './video-wallpaper';
-
-const DESKTOP_ICONS = [
-  { id: 'about', label: 'About Me', icon: ThisPC },
-  { id: 'skills', label: 'Skills', icon: '⚙️' },
-  { id: 'projects', label: 'Projects', icon: '📁' },
-  { id: 'contact', label: 'Contact', icon: '✉️' },
-  { id: 'resume', label: 'Resume', icon: '📄' },
-];
+import { APPS_CONFIG } from '../../config/apps-config';
 
 const WINDOW_COMPONENTS: Record<string, React.ComponentType<any>> = {
   about: AboutWindow,
@@ -39,6 +31,7 @@ const WALLPAPERS = [
   { id: 'rose', gradient: 'from-[#c94b4b] to-[#4b134f]', name: 'Rose' },
   { id: 'sky', gradient: 'from-[#56ccf2] to-[#2f80ed]', name: 'Sky' },
 ];
+
 export function Desktop() {
   const { state, dispatch } = useOS();
   const [showWallpaperMenu, setShowWallpaperMenu] = useState(false);
@@ -118,9 +111,9 @@ export function Desktop() {
           />
         )}
 
-        {/* Desktop Icons */}
-        <div className="p-4 absolute top-0 left-0 flex flex-col gap-4 z-10">
-          {DESKTOP_ICONS.map((item) => (
+        {/* Desktop Icons - RESPONSIVE VERSION */}
+        <div className="p-4 absolute top-0 left-0 bottom-12 flex flex-col flex-wrap gap-4 z-10 content-start max-h-[calc(100vh-3rem)]">
+          {APPS_CONFIG.map((item) => (
             <DesktopIcon
               key={item.id}
               id={item.id}

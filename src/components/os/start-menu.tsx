@@ -4,25 +4,13 @@ import React from 'react';
 import { useOS } from './os-context';
 import { Power, Settings, CircleUser } from 'lucide-react';
 import Image from 'next/image';
-import ThisPC from '../../assets/this-pc.png';
+import { APPS_CONFIG, PINNED_TILES } from '../../config/apps-config';
 
 export function StartMenu() {
   const { state, dispatch } = useOS();
 
-  const apps = [
-    { id: 'about', label: 'About Me', icon: ThisPC },
-    { id: 'skills', label: 'Skills', icon: '⚙️' },
-    { id: 'projects', label: 'Projects', icon: '📁' },
-    { id: 'contact', label: 'Contact', icon: '✉️' },
-    { id: 'resume', label: 'Resume', icon: '📄' },
-  ];
-
-  const tiles = [
-    { id: 'about', label: 'About', color: 'bg-blue-600' },
-    { id: 'projects', label: 'Projects', color: 'bg-purple-600' },
-    { id: 'skills', label: 'Skills', color: 'bg-green-600' },
-    { id: 'contact', label: 'Contact', color: 'bg-pink-600' },
-  ];
+  const apps = APPS_CONFIG;
+  const tiles = PINNED_TILES;
 
   const handleAppClick = (appId: string) => {
     dispatch({ type: 'OPEN_WINDOW', payload: appId });
