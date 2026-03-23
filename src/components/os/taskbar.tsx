@@ -13,9 +13,9 @@ export function Taskbar() {
 
   useEffect(() => {
     const updateFireWidth = () => {
-      const width = window.innerWidth >= 768 
+      const width = window.innerWidth > 2560 
         ? 800 
-        : window.innerWidth / 1.88;
+        : window.innerWidth / 1.8;
       setFireWidth(width);
     };
     
@@ -69,13 +69,12 @@ export function Taskbar() {
 
   return (
     <>
-      {/* FluidFire - RA NGOÀI Taskbar, z-index thấp hơn windows */}
       {isMounted && (
         <div
           className="fixed left-0 right-0 pointer-events-none !z-[1]"
           style={{
             bottom: '48px', // Chiều cao taskbar (h-12 = 48px)
-            height: '70px',
+            height: '63px',
             overflow: 'hidden',
             width: '100%',
           }}
