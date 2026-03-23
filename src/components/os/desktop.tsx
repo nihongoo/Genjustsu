@@ -11,14 +11,7 @@ import { ContactWindow } from '../windows/contact-window';
 import { ResumeWindow } from '../windows/resume-window';
 import ThisPC from '../../assets/this-pc.png';
 import { VideoWallpaper } from './video-wallpaper';
-
-const DESKTOP_ICONS = [
-  { id: 'about', label: 'About Me', icon: ThisPC },
-  { id: 'skills', label: 'Skills', icon: '⚙️' },
-  { id: 'projects', label: 'Projects', icon: '📁' },
-  { id: 'contact', label: 'Contact', icon: '✉️' },
-  { id: 'resume', label: 'Resume', icon: '📄' },
-];
+import { APPS_CONFIG } from '../../config/apps-config';
 
 const WINDOW_COMPONENTS: Record<string, React.ComponentType<any>> = {
   about: AboutWindow,
@@ -120,7 +113,7 @@ export function Desktop() {
 
         {/* Desktop Icons */}
         <div className="p-4 absolute top-0 left-0 flex flex-col gap-4 z-10">
-          {DESKTOP_ICONS.map((item) => (
+          {APPS_CONFIG.map((item) => (
             <DesktopIcon
               key={item.id}
               id={item.id}
