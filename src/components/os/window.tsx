@@ -3,7 +3,13 @@
 import React, { useState, ReactNode, useEffect } from 'react';
 import { X, Minus, Square } from 'lucide-react';
 import { useOS } from './os-context';
-import FluidFire from '../ui/fluid-fire';
+import dynamic from 'next/dynamic';
+
+// Lazy load FluidFire
+const FluidFire = dynamic(() => import('../ui/fluid-fire'), {
+  ssr: false,
+  loading: () => <div className="w-full h-8" />
+});
 
 interface WindowProps {
   id: string;
@@ -43,7 +49,10 @@ export function Window({
     };
 
     updateFireWidth();
-    setIsMounted(true);
+    // Delay mounting để tránh blocking main thread
+    requestAnimationFrame(() => {
+      setIsMounted(true);
+    });
 
     window.addEventListener('resize', updateFireWidth);
     return () => window.removeEventListener('resize', updateFireWidth);
@@ -117,15 +126,16 @@ export function Window({
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      {isMounted && (
-        <div
-          className="left-0 right-0 pointer-events-none !z-[1]"
-          style={{
-            height: '32px',
-            overflow: 'hidden',
-            width: '100%',
-          }}
-        >
+      {/* Fire Effect - với reserved space */}
+      <div
+        className="left-0 right-0 pointer-events-none z-[1]"
+        style={{
+          height: '32px',
+          width: '100%',
+          containIntrinsicSize: '100% 32px',
+        }}
+      >
+        {isMounted && (
           <div style={{
             width: '100%',
             height: '100%',
@@ -139,8 +149,9 @@ export function Window({
               style={config.style.canvas}
             />
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
       {/* Title Bar */}
       <div
         onMouseDown={handleMouseDown}
