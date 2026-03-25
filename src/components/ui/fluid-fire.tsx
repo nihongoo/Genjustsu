@@ -8,6 +8,8 @@ import { useRef, useEffect, useCallback } from 'react';
 import { useFluidFire } from '../../hooks/useFluidFire';
 
 
+// fluid-fire.tsx - CANVAS VERSION
+
 export const FluidFire = ({
     width = 80,
     height = 60,
@@ -47,10 +49,10 @@ export const FluidFire = ({
     onSimulationReady = null,
     onMouseMove = null,
 }) => {
-    const svgRef = useRef(null);
+    const canvasRef = useRef(null); // ← ĐỔI TÊN: svgRef → canvasRef
 
-    const { isReady, setObstacle } = useFluidFire({
-        svgRef,
+    const { setObstacle } = useFluidFire({
+        canvasRef, // ← ĐỔI TÊN
         width,
         height,
         fps,
@@ -69,82 +71,50 @@ export const FluidFire = ({
         onSimulationReady,
     });
 
-    const handleMouseDown = useCallback((e) => {
-        if (!interactive || !svgRef.current) return;
-
-        const rect = svgRef.current.getBoundingClientRect();
-        const mx = e.clientX - rect.left;
-        const my = e.clientY - rect.top;
-
-        const cScale = height / 1.0;
-        const x = mx / cScale;
-        const y = (height - my) / cScale;
-
-        setObstacle(x, y, true);
-    }, [interactive, height, setObstacle]);
-
-    const handleMouseMove = useCallback((e) => {
-        if (!interactive || !svgRef.current) return;
-
-        const rect = svgRef.current.getBoundingClientRect();
-        const mx = e.clientX - rect.left;
-        const my = e.clientY - rect.top;
-
-        const cScale = height / 1.0;
-        const x = mx / cScale;
-        const y = (height - my) / cScale;
-
-        setObstacle(x, y, false);
-
+    const handleMouseMove = (e) => {
+        if (!interactive || !canvasRef.current) return; // ← ĐỔI TÊN
+        
+        const rect = canvasRef.current.getBoundingClientRect(); // ← ĐỔI TÊN
+        const x = ((e.clientX - rect.left) / rect.width) * width;
+        const y = height - ((e.clientY - rect.top) / rect.height) * height;
+        
+        setObstacle(x / height, y / height, false);
+        
         if (onMouseMove) {
-            onMouseMove({ x, y, screenX: mx, screenY: my });
+            onMouseMove(e, { x, y });
         }
-    }, [interactive, height, setObstacle, onMouseMove]);
+    };
 
-    const handleTouchStart = useCallback((e) => {
-        if (!interactive || !svgRef.current) return;
+    const handleMouseDown = (e) => {
+        if (!interactive) return;
+        handleMouseMove(e);
+    };
 
+    const handleTouchMove = (e) => {
+        if (!interactive || !canvasRef.current) return; // ← ĐỔI TÊN
+        
         const touch = e.touches[0];
-        const rect = svgRef.current.getBoundingClientRect();
-        const mx = touch.clientX - rect.left;
-        const my = touch.clientY - rect.top;
+        const rect = canvasRef.current.getBoundingClientRect(); // ← ĐỔI TÊN
+        const x = ((touch.clientX - rect.left) / rect.width) * width;
+        const y = height - ((touch.clientY - rect.top) / rect.height) * height;
+        
+        setObstacle(x / height, y / height, false);
+    };
 
-        const cScale = height / 1.0;
-        const x = mx / cScale;
-        const y = (height - my) / cScale;
-
-        setObstacle(x, y, true);
-    }, [interactive, height, setObstacle]);
-
-    const handleTouchMove = useCallback((e) => {
-        if (!interactive || !svgRef.current) return;
-
-        e.preventDefault();
-
-        const touch = e.touches[0];
-        const rect = svgRef.current.getBoundingClientRect();
-        const mx = touch.clientX - rect.left;
-        const my = touch.clientY - rect.top;
-
-        const cScale = height / 1.0;
-        const x = mx / cScale;
-        const y = (height - my) / cScale;
-
-        setObstacle(x, y, false);
-    }, [interactive, height, setObstacle]);
+    const handleTouchStart = (e) => {
+        if (!interactive) return;
+        handleTouchMove(e);
+    };
 
     return (
-        <svg
-            ref={svgRef}
-            viewBox={`0 0 ${width} ${height}`}
-            xmlns="http://www.w3.org/2000/svg"
+        <div
+            ref={canvasRef} // ← ĐỔI TÊN
             className={className}
             style={{
                 width: '100%',
                 height: '100%',
                 display: 'block',
-                objectFit: 'fill', // ← Thêm
-                verticalAlign: 'bottom',
+                backgroundColor,
                 cursor: interactive ? 'crosshair' : 'default',
                 ...style,
             }}
@@ -153,10 +123,17 @@ export const FluidFire = ({
             onTouchStart={interactive ? handleTouchStart : undefined}
             onTouchMove={interactive ? handleTouchMove : undefined}
         >
-            <rect width={width} height={height} fill={backgroundColor} />
-            <g id="fluidGrid" />
-            <g id="obstacleGroup" />
-        </svg>
+            {/* ← THAY THẾ SVG BẰNG CANVAS */}
+            <canvas
+                width={width}
+                height={height}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    display: 'block',
+                }}
+            />
+        </div>
     );
 };
 

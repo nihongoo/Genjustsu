@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, ReactNode, useEffect } from 'react';
+import React, { useState, ReactNode, useEffect, useRef } from 'react';
 import { X, Minus, Square } from 'lucide-react';
 import { useOS } from './os-context';
 import dynamic from 'next/dynamic';
+import Image, { StaticImageData } from 'next/image';
 
 // Lazy load FluidFire
 const FluidFire = dynamic(() => import('../ui/fluid-fire'), {
@@ -14,7 +15,7 @@ const FluidFire = dynamic(() => import('../ui/fluid-fire'), {
 interface WindowProps {
   id: string;
   title: string;
-  icon: string;
+  icon: string | StaticImageData;
   children: ReactNode;
   position: { x: number; y: number };
   size: { width: number; height: number };
@@ -35,21 +36,18 @@ export function Window({
   zIndex,
 }: WindowProps) {
   const { dispatch } = useOS();
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [fireWidth, setFireWidth] = useState(800);
+  const [fireWidth, setFireWidth] = useState(size.width / 1.8);
   const [isMounted, setIsMounted] = useState(false);
+  const isDraggingRef = useRef(false);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const updateFireWidth = () => {
-      const width = window.innerWidth >= 768
-        ? 800
-        : window.innerWidth / 1.88;
+      const width = size.width / 1;
+        console.log('calculated width:', width); 
       setFireWidth(width);
     };
-
     updateFireWidth();
-    // Delay mounting để tránh blocking main thread
     requestAnimationFrame(() => {
       setIsMounted(true);
     });
@@ -59,19 +57,28 @@ export function Window({
   }, []);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setDragOffset({
+    document.body.style.userSelect = 'none';
+    const rect = e.currentTarget.getBoundingClientRect();
+
+    dragOffsetRef.current = {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
-    });
-    setIsDragging(true);
+    };
+
+    isDraggingRef.current = true;
+
     dispatch({ type: 'FOCUS_WINDOW', payload: id });
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
-    const newX = e.clientX - dragOffset.x;
-    const newY = e.clientY - dragOffset.y;
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDraggingRef.current) return;
+
+    const newX = e.clientX - dragOffsetRef.current.x;
+    const newY = e.clientY - dragOffsetRef.current.y;
+
     dispatch({
       type: 'MOVE_WINDOW',
       payload: { id, x: newX, y: newY },
@@ -79,7 +86,10 @@ export function Window({
   };
 
   const handleMouseUp = () => {
-    setIsDragging(false);
+    isDraggingRef.current = false;
+
+    window.removeEventListener('mousemove', handleMouseMove);
+    window.removeEventListener('mouseup', handleMouseUp);
   };
 
   if (isMinimized) return null;
@@ -98,7 +108,7 @@ export function Window({
       width: fireWidth,
       height: 35,
       fps: 30,
-      gridResolution: fireWidth < 400 ? 8000 : 18000,
+      gridResolution: fireWidth < 400 ? 8000 : 10000,
       gravity: 0.0,
       burningFloor: true,
       burningObstacle: false,
@@ -122,11 +132,8 @@ export function Window({
     <div
       style={windowStyle}
       className="flex flex-col dark:bg-[#2a2a2a] dark:border-[#404040] shadow-lg"
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
+      onMouseDown={handleMouseDown}
     >
-      {/* Fire Effect - với reserved space */}
       <div
         className="left-0 right-0 pointer-events-none z-[1]"
         style={{
@@ -155,10 +162,20 @@ export function Window({
       {/* Title Bar */}
       <div
         onMouseDown={handleMouseDown}
-        className="flex bg-blue items-center justify-between h-8 bg-[#0078d4] text-white px-2 cursor-move select-none flex-shrink-0"
+        className="flex bg-blue items-center justify-between h-8 bg-[#d12b58] text-white px-2 cursor-move select-none flex-shrink-0"
       >
         <div className="flex items-center gap-2 flex-1">
-          <span className="text-sm">{icon}</span>
+          {typeof icon === 'object' ? (
+            <Image
+              src={icon}
+              alt=''
+              width={27}
+              height={27}
+              className="pointer-events-none"
+            />
+          ) : (
+            <div className="text-xl select-none">{icon}</div>
+          )}
           <span className="text-sm font-medium">{title}</span>
         </div>
 

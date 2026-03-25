@@ -1,4 +1,5 @@
 import ThisPC from '../assets/this-pc.png';
+import Commands from '../assets/commands.png';
 
 export interface AppConfig {
   id: string;
@@ -19,6 +20,7 @@ export const APPS_CONFIG: AppConfig[] = [
   { id: 'projects', label: 'Projects', icon: '📁' },
   { id: 'contact', label: 'Contact', icon: '✉️' },
   { id: 'resume', label: 'Resume', icon: '📄' },
+  { id: 'commands', label: 'Commands', icon: Commands },
 ];
 
 /**

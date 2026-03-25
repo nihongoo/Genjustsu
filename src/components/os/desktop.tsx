@@ -9,6 +9,7 @@ import { SkillsWindow } from '../windows/skills-window';
 import { ProjectsWindow } from '../windows/projects-window';
 import { ContactWindow } from '../windows/contact-window';
 import { ResumeWindow } from '../windows/resume-window';
+import { CommandsWindow } from '../windows/command-window';
 import { VideoWallpaper } from './video-wallpaper';
 import { APPS_CONFIG } from '../../config/apps-config';
 
@@ -18,6 +19,7 @@ const WINDOW_COMPONENTS: Record<string, React.ComponentType<any>> = {
   projects: ProjectsWindow,
   contact: ContactWindow,
   resume: ResumeWindow,
+  commands: CommandsWindow,
 };
 
 // Predefined wallpapers

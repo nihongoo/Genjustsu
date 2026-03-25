@@ -1,11 +1,15 @@
 'use client';
 
 import React, { createContext, useReducer, ReactNode } from 'react';
+import ThisPc from '../../assets/this-pc.png';
+import Commands from '../../assets/commands.png';
+import { th } from 'date-fns/locale';
+import { StaticImageData } from 'next/image';
 
 export interface WindowState {
   id: string;
   title: string;
-  icon: string;
+  icon: string | StaticImageData;
   isOpen: boolean;
   isMinimized: boolean;
   isMaximized: boolean;
@@ -72,7 +76,7 @@ function osReducer(state: OSState, action: OSAction): OSState {
         about: {
           id: 'about',
           title: 'About Me',
-          icon: '👤',
+          icon: ThisPc,
           isOpen: true,
           isMinimized: false,
           isMaximized: false,
@@ -113,6 +117,16 @@ function osReducer(state: OSState, action: OSAction): OSState {
           id: 'resume',
           title: 'Resume',
           icon: '📄',
+          isOpen: true,
+          isMinimized: false,
+          isMaximized: false,
+          position: { x: 300, y: 280 },
+          size: { width: 650, height: 520 },
+        },
+        commands: {
+          id: 'commands',
+          title: 'Commands',
+          icon: Commands,
           isOpen: true,
           isMinimized: false,
           isMaximized: false,

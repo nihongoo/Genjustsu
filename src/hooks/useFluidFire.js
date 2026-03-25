@@ -8,7 +8,7 @@ import { getFireColor } from '../lib/color-schemes';
  * @returns {Object} - Simulation controls and state
  */
 export const useFluidFire = ({
-    svgRef,
+    canvasRef,
     width = 800,
     height = 600,
     fps = 30,
@@ -40,6 +40,7 @@ export const useFluidFire = ({
 } = {}) => {
     const fluidRef = useRef(null);
     const sceneRef = useRef(null);
+    const ctxRef = useRef(null);
     const gridCellsRef = useRef([]);
     const obstacleGroupRef = useRef(null);
     const animationFrameRef = useRef(null);
@@ -55,8 +56,8 @@ export const useFluidFire = ({
     });
 
     // Setup simulation
-    const setupSimulation = useCallback(() => {
-        if (!svgRef.current) return;
+     const setupSimulation = useCallback(() => {
+        if (!canvasRef.current) return; // Check canvasRef
 
         const simHeight = 1.0;
         const cScale = height / simHeight;
@@ -65,7 +66,6 @@ export const useFluidFire = ({
         const numX = Math.floor(simWidth / h);
         const numY = Math.floor(simHeight / h);
 
-        // Create scene config
         sceneRef.current = {
             gravity,
             dt: 1.0 / fps,
@@ -93,14 +93,18 @@ export const useFluidFire = ({
             numY,
         };
 
-        // Create fluid simulator
         fluidRef.current = new Fluid(numX, numY, h);
-
-        // Bind floor shape checker
         fluidRef.current.isInFloorShape = (i, j) => isInFloorShape(i, j, sceneRef.current);
 
-        // Create SVG grid cells
-        createGrid(svgRef.current, sceneRef.current, gridCellsRef);
+        // ← SETUP CANVAS (thay vì tạo SVG grid)
+        const canvas = canvasRef.current.querySelector('canvas');
+        if (canvas) {
+            ctxRef.current = canvas.getContext('2d', {
+                alpha: true,
+                desynchronized: true,
+                willReadFrequently: false
+            });
+        }
 
         setStats(prev => ({ ...prev, gridSize: `${numX}×${numY}` }));
         setIsReady(true);
@@ -112,7 +116,7 @@ export const useFluidFire = ({
             });
         }
     }, [
-        svgRef, width, height, fps, gridResolution, gravity, numIters,
+        canvasRef, width, height, fps, gridResolution, gravity, numIters,
         burningObstacle, burningFloor, showSwirls, swirlProbability,
         swirlMaxRadius, floorShape, floorThickness, floorCurve, onSimulationReady
     ]);
@@ -211,46 +215,48 @@ export const useFluidFire = ({
 
     // Draw function
     const draw = useCallback(() => {
-        if (!fluidRef.current || !sceneRef.current) return;
+        if (!fluidRef.current || !sceneRef.current || !ctxRef.current) return;
 
         const f = fluidRef.current;
         const scene = sceneRef.current;
+        const ctx = ctxRef.current;
         const n = f.numY;
 
-        let cellIndex = 0;
+        // Clear canvas
+        ctx.clearRect(0, 0, scene.width, scene.height);
+
+        const cellScale = 1.1;
+        const cellWidth = scene.cScale * scene.h * cellScale;
+        const cellHeight = scene.cScale * scene.h * cellScale;
+
+        // Vẽ fire cells
         for (let i = 0; i < scene.numX; i++) {
             for (let j = 0; j < scene.numY; j++) {
                 const temp = f.t[i * n + j];
+                
+                if (temp < 0.1) continue; // Skip transparent cells
+                
                 const color = getFireColor(temp, colorScheme);
-                if (gridCellsRef.current[cellIndex]) {
-                    gridCellsRef.current[cellIndex].setAttribute('fill', color);
-                }
-                cellIndex++;
+                
+                const x = i * scene.cScale * scene.h;
+                const y = scene.height - (j + 1) * scene.cScale * scene.h;
+
+                ctx.fillStyle = color;
+                ctx.fillRect(x, y, cellWidth, cellHeight);
             }
         }
 
-        // Update obstacle
-        if (obstacleGroupRef.current) {
-            if (scene.burningObstacle) {
-                if (obstacleGroupRef.current.children.length === 0) {
-                    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    circle.setAttribute('stroke', '#404040');
-                    circle.setAttribute('stroke-width', '3');
-                    circle.setAttribute('fill', 'none');
-                    obstacleGroupRef.current.appendChild(circle);
-                }
+        // Vẽ obstacle
+        if (scene.burningObstacle) {
+            const r = (scene.obstacleRadius + scene.h) * scene.cScale;
+            const cx = scene.obstacleX * scene.cScale;
+            const cy = scene.height - scene.obstacleY * scene.cScale;
 
-                const circle = obstacleGroupRef.current.children[0];
-                const r = (scene.obstacleRadius + scene.h) * scene.cScale;
-                const cx = scene.obstacleX * scene.cScale;
-                const cy = scene.height - scene.obstacleY * scene.cScale;
-
-                circle.setAttribute('cx', cx);
-                circle.setAttribute('cy', cy);
-                circle.setAttribute('r', r);
-            } else {
-                obstacleGroupRef.current.innerHTML = '';
-            }
+            ctx.strokeStyle = '#404040';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.stroke();
         }
     }, [colorScheme]);
 
@@ -326,12 +332,6 @@ export const useFluidFire = ({
     }, [burningFloor, burningObstacle, showSwirls, swirlProbability,
         swirlMaxRadius, gravity, floorShape, floorThickness, floorCurve]);
 
-    // Store obstacle group ref
-    useEffect(() => {
-        if (svgRef.current) {
-            obstacleGroupRef.current = svgRef.current.querySelector('#obstacleGroup');
-        }
-    }, [svgRef]);
 
     // Set obstacle position
     const setObstacle = useCallback((x, y, reset = false) => {

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useOS } from './os-context';
 import { Wifi, Volume2, Grid2x2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import Image, { StaticImageData } from 'next/image';
 
 // Lazy load FluidFire component
 const FluidFire = dynamic(() => import('../ui/fluid-fire').then(mod => mod.FluidFire), {
@@ -19,15 +20,15 @@ export function Taskbar() {
 
   useEffect(() => {
     const updateFireWidth = () => {
-      const width = window.innerWidth > 2560 
-        ? 800 
+      const width = window.innerWidth > 2560
+        ? 800
         : window.innerWidth / 1.8;
       setFireWidth(width);
     };
-    
+
     updateFireWidth();
     setIsMounted(true);
-    
+
     window.addEventListener('resize', updateFireWidth);
     return () => window.removeEventListener('resize', updateFireWidth);
   }, []);
@@ -85,7 +86,7 @@ export function Taskbar() {
             width: '100%',
           }}
         >
-          <div 
+          <div
             className="w-full h-full absolute bottom-0"
             style={{
               containIntrinsicSize: '100% 63px', // Optimize rendering
@@ -103,13 +104,12 @@ export function Taskbar() {
 
       {/* Taskbar - với fixed dimensions */}
       <div className="fixed bottom-0 left-0 right-0 h-12 bg-gradient-to-r from-[#0a0a0a] via-[#1a0009] to-[#0a0a0a] flex items-center justify-between px-2 z-[9999]">
-        
+
         <div className="flex items-center gap-1">
           <button
             onClick={() => dispatch({ type: 'TOGGLE_START_MENU' })}
-            className={`h-10 w-12 flex items-center justify-center hover:bg-white/10 transition ${
-              state.startMenuOpen ? 'bg-white/10' : ''
-            }`}
+            className={`h-10 w-12 flex items-center justify-center hover:bg-white/10 transition ${state.startMenuOpen ? 'bg-white/10' : ''
+              }`}
           >
             <Grid2x2 size={20} className="text-white" />
           </button>
@@ -128,7 +128,18 @@ export function Taskbar() {
                 className={`relative h-10 w-12 flex items-center justify-center hover:bg-white/10 transition`}
                 title={window.title}
               >
-                <span className="text-lg">{window.icon}</span>
+
+                {typeof window.icon === 'object' ? (
+                  <Image
+                    src={window.icon}
+                    alt={window.title}
+                    width={27}
+                    height={27}
+                    className="pointer-events-none"
+                  />
+                ) : (
+                  <div className="text-xl select-none">{window.icon}</div>
+                )}
 
                 {/* ACTIVE INDICATOR */}
                 {!window.isMinimized && (
