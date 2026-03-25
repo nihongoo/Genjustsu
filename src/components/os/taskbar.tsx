@@ -3,7 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { useOS } from './os-context';
 import { Wifi, Volume2, Grid2x2 } from 'lucide-react';
-import { FluidFire } from '../ui/fluid-fire'
+import dynamic from 'next/dynamic';
+
+// Lazy load FluidFire component
+const FluidFire = dynamic(() => import('../ui/fluid-fire').then(mod => mod.FluidFire), {
+  ssr: false,
+  loading: () => <div className="w-full h-full" />
+});
 
 export function Taskbar() {
   const { state, dispatch } = useOS();
@@ -69,22 +75,22 @@ export function Taskbar() {
 
   return (
     <>
+      {/* Fire Effect Container - với aspect-ratio để tránh CLS */}
       {isMounted && (
         <div
-          className="fixed left-0 right-0 pointer-events-none !z-[1]"
+          className="fixed left-0 right-0 pointer-events-none z-[1]"
           style={{
-            bottom: '48px', // Chiều cao taskbar (h-12 = 48px)
+            bottom: '48px',
             height: '63px',
-            overflow: 'hidden',
             width: '100%',
           }}
         >
-          <div style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            bottom: 0,
-          }}>
+          <div 
+            className="w-full h-full absolute bottom-0"
+            style={{
+              containIntrinsicSize: '100% 63px', // Optimize rendering
+            }}
+          >
             <FluidFire
               {...config.config}
               interactive={false}
@@ -95,7 +101,7 @@ export function Taskbar() {
         </div>
       )}
 
-      {/* Taskbar */}
+      {/* Taskbar - với fixed dimensions */}
       <div className="fixed bottom-0 left-0 right-0 h-12 bg-gradient-to-r from-[#0a0a0a] via-[#1a0009] to-[#0a0a0a] flex items-center justify-between px-2 z-[9999]">
         
         <div className="flex items-center gap-1">
@@ -142,8 +148,8 @@ export function Taskbar() {
             <Volume2 size={16} />
           </button>
 
-          <div className="px-3 text-xs leading-tight text-right">
-            <div>{time}</div>
+          <div className="px-3 text-xs leading-tight text-right min-w-[3rem]">
+            <div>{time || '00:00'}</div>
           </div>
         </div>
 
