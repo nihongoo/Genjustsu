@@ -64,29 +64,35 @@ Available commands:
     };
 
     return (
-        <div
-            className="bg-black text-red-400 font-mono text-sm h-full w-full p-4 overflow-auto"
-            onClick={() => inputRef.current?.focus()}
-        >
-            {/* History */}
-            <div className="space-y-1">
-                {history.map((line, index) => (
-                    <div key={index} className="whitespace-pre-wrap">
-                        {line}
-                    </div>
-                ))}
-            </div>
+        <div className=" p-2 bg-black h-full">
+            {/* Terminal Header */}
+            {/* <div className="pb-4">
+                <h2></h2>
+            </div> */}
+            <div
+                className="bg-black text-red-400 font-mono text-sm h-full w-full overflow-auto mt-3"
+                onClick={() => inputRef.current?.focus()}
+            >
+                {/* History */}
+                <div className="space-y-1">
+                    {history.map((line, index) => (
+                        <div key={index} className="whitespace-pre-wrap">
+                            {line}
+                        </div>
+                    ))}
+                </div>
 
-            {/* Input line */}
-            <div className="flex items-center mt-2">
-                <span className="mr-2">{'>'}</span>
-                <input
-                    ref={inputRef}
-                    className="bg-transparent outline-none flex-1 text-red-400 caret-red-400"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                />
+                {/* Input line */}
+                <div className="flex items-center mt-2">
+                    <span className="mr-2">{'>'}</span>
+                    <input
+                        ref={inputRef}
+                        className="bg-transparent outline-none flex-1 text-red-400 caret-red-400"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                    />
+                </div>
             </div>
         </div>
     );
