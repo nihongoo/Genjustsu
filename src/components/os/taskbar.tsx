@@ -79,7 +79,7 @@ export function Taskbar() {
       {/* Fire Effect Container - với aspect-ratio để tránh CLS */}
 
       <div
-        className="fixed left-0 right-0 pointer-events-none z-[1]"
+        className="fixed left-0 right-0 pointer-events-none z-[1] p-2 bg-black"
         style={{
           bottom: '48px',
           height: '63px',
@@ -88,7 +88,7 @@ export function Taskbar() {
         }}
       >
         <div
-          className="w-full h-full absolute bottom-0"
+          className="w-full h-full absolute bottom-0 bg-black"
           style={{
             containIntrinsicSize: '100% 63px', // Optimize rendering
           }}
