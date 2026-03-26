@@ -77,30 +77,32 @@ export function Taskbar() {
   return (
     <>
       {/* Fire Effect Container - với aspect-ratio để tránh CLS */}
-      {isMounted && (
+
+      <div
+        className="fixed left-0 right-0 pointer-events-none z-[1]"
+        style={{
+          bottom: '48px',
+          height: '63px',
+          width: '100%',
+          minHeight: '63px',
+        }}
+      >
         <div
-          className="fixed left-0 right-0 pointer-events-none z-[1]"
+          className="w-full h-full absolute bottom-0"
           style={{
-            bottom: '48px',
-            height: '63px',
-            width: '100%',
+            containIntrinsicSize: '100% 63px', // Optimize rendering
           }}
         >
-          <div
-            className="w-full h-full absolute bottom-0"
-            style={{
-              containIntrinsicSize: '100% 63px', // Optimize rendering
-            }}
-          >
+          {isMounted && (
             <FluidFire
               {...config.config}
               interactive={false}
               backgroundColor='transparent'
               style={config.style.canvas}
             />
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Taskbar - với fixed dimensions */}
       <div className="fixed bottom-0 left-0 right-0 h-12 bg-gradient-to-r from-[#0a0a0a] via-[#1a0009] to-[#0a0a0a] flex items-center justify-between px-2 z-[9999]">
