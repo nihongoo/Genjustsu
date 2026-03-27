@@ -77,21 +77,21 @@ export function Taskbar() {
   return (
     <>
       {/* Fire Effect Container - với aspect-ratio để tránh CLS */}
-      {isMounted && (
-        <div
-          className="fixed left-0 right-0 pointer-events-none z-[1]"
-          style={{
-            bottom: '48px',
-            height: '63px',
+
+
+      <div
+        className="fixed left-0 right-0 pointer-events-none z-[1] bg-transparent"
+        style={{
+          bottom: '0px',
+          height: '63px',
+          width: '100%',
+        }}
+      >
+        {isMounted && (
+          <div style={{
             width: '100%',
-          }}
-        >
-          <div
-            className="w-full h-full absolute bottom-0"
-            style={{
-              containIntrinsicSize: '100% 63px', // Optimize rendering
-            }}
-          >
+            height: '100%',
+          }}>
             <FluidFire
               {...config.config}
               interactive={false}
@@ -99,12 +99,12 @@ export function Taskbar() {
               style={config.style.canvas}
             />
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
 
       {/* Taskbar - với fixed dimensions */}
-      <div className="fixed bottom-0 left-0 right-0 h-12 bg-gradient-to-r from-[#0a0a0a] via-[#1a0009] to-[#0a0a0a] flex items-center justify-between px-2 z-[9999]">
-
+      <div className="fixed bottom-0 left-0 right-0 h-12 flex items-center justify-between px-2 z-[9999]">
         <div className="flex items-center gap-1">
           <button
             onClick={() => dispatch({ type: 'TOGGLE_START_MENU' })}

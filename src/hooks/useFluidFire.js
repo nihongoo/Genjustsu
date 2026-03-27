@@ -101,7 +101,7 @@ export const useFluidFire = ({
         if (canvas) {
             ctxRef.current = canvas.getContext('2d', {
                 alpha: true,
-                desynchronized: true,
+                desynchronized: false,
                 willReadFrequently: false
             });
         }
@@ -121,36 +121,6 @@ export const useFluidFire = ({
         swirlMaxRadius, floorShape, floorThickness, floorCurve, onSimulationReady
     ]);
 
-    // Create SVG grid
-    const createGrid = (svg, scene, gridCellsRef) => {
-        const gridGroup = svg.querySelector('#fluidGrid');
-        if (!gridGroup) return;
-
-        gridGroup.innerHTML = '';
-        gridCellsRef.current = [];
-
-        const cellScale = 1.1;
-        const cellWidth = scene.cScale * scene.h * cellScale;
-        const cellHeight = scene.cScale * scene.h * cellScale;
-
-        for (let i = 0; i < scene.numX; i++) {
-            for (let j = 0; j < scene.numY; j++) {
-                const x = i * scene.cScale * scene.h;
-                const y = scene.height - (j + 1) * scene.cScale * scene.h;
-
-                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('x', x);
-                rect.setAttribute('y', y);
-                rect.setAttribute('width', cellWidth);
-                rect.setAttribute('height', cellHeight);
-                rect.setAttribute('fill', 'transparent');
-                rect.setAttribute('shape-rendering', 'crispEdges');
-
-                gridGroup.appendChild(rect);
-                gridCellsRef.current.push(rect);
-            }
-        }
-    };
 
     // Check if cell is in floor shape
     const isInFloorShape = (i, j, scene) => {
